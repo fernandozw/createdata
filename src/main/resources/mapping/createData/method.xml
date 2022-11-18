@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.server.dao.MethodDao">
+    <!--批量新增方法信息-->
+    <insert id="batchAddMethod" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id" parameterType="java.util.List">
+        INSERT INTO
+        method(scriptId,methodName,methodLabel,existParam)
+        VALUES
+        <foreach collection="methodList" item="methodEntity" separator=",">
+            (
+            #{methodEntity.scriptId},
+            #{methodEntity.methodName},
+            #{methodEntity.methodLabel},
+            #{methodEntity.existParam}
+            )
+        </foreach>
+    </insert>
+    <!--根据脚本id获取方法对象-->
+    <select id="getMethodByScriptId"
+            resultType="com.thinkingdata.server.model.MethodEntity">
+		select * from method where scriptId=#{scriptId}
+	</select>
+
+    <!--批量更新方法信息-->
+    <update id="batchUpdateMethod" parameterType="java.util.List">
+        <foreach collection="methodList" item="methodEntity" index="index" open="" close="" separator=";">
+            UPDATE method
+            <set>
+                <if test="methodEntity.methodLabel != null and methodEntity.methodLabel != ''">
+                    methodLabel = #{methodEntity.methodLabel}
+                </if>
+            </set>
+            <where>
+                id = #{methodEntity.id}
+            </where>
+        </foreach>
+    </update>
+    <!--根据方法id删除方法-->
+    <delete id="deleteMethodById">
+        DELETE from method WHERE id=#{id}
+    </delete>
+
+    <!--更新方法参数配置标识位-->
+    <update id="updateParamSet">
+            UPDATE method set setParam = #{status} where id=#{id}
+    </update>
+</mapper>

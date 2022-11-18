@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.server.dao.DataSourceDao">
+    <!--新增数据源信息-->
+    <insert id="addDataSource" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id" parameterType="com.thinkingdata.server.model.DataSourceEntity">
+        INSERT INTO
+        dataSource(name,type,url,port,user,password,tables)
+        VALUES(#{name},#{type},#{url},#{port},#{user},#{password},#{tables})
+    </insert>
+    <!--根据查询条件获取数据源列表-->
+    <select id="dataSourceList" parameterType="java.util.Map"
+            resultType="com.thinkingdata.server.model.DataSourceEntity">
+        select * from datasource where 1=1
+        <if test="type != null and type != ''">
+            and type=#{type}
+        </if>
+        <if test="name != null and name != ''">
+            and name like concat('%', #{name}, '%')
+        </if>
+        order by updateTime desc
+    </select>
+    <select id="getDataSource" parameterType="java.util.Map"
+            resultType="com.thinkingdata.server.model.DataSourceEntity">
+        select * from datasource where id=#{id}
+    </select>
+    <!--更新数据源信息-->
+    <update id="updateDataSource" parameterType="com.thinkingdata.server.model.DataSourceEntity">
+        UPDATE datasource
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="type != null and type != ''">
+                type = #{type},
+            </if>
+            <if test="url != null and url != ''">
+                url = #{url},
+            </if>
+            <if test="port != null and port != ''">
+                port = #{port},
+            </if>
+            <if test="user != null and user != ''">
+                user = #{user},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="tables != null and tables != ''">
+                tables = #{tables}
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+    <!--根据项目id删除数据源-->
+    <delete id="deleteDataSource">
+        DELETE from datasource WHERE id=#{id}
+    </delete>
+</mapper>

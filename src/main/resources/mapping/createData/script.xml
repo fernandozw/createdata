@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.server.dao.ScriptDao">
+    <!--新增脚本-->
+    <insert id="addScript" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id" parameterType="com.thinkingdata.server.model.ScriptEntity">
+		INSERT INTO
+		script(name,projectId,content,owner,isDone,type)
+		VALUES(#{name},#{projectId},#{content},#{owner},#{isDone},#{type})
+	</insert>
+    <!--根据脚本id获取脚本对象-->
+    <select id="getScriptById"
+            resultType="com.thinkingdata.server.model.ScriptEntity">
+		select * from script where id=#{id}
+	</select>
+    <!--根据脚本id删除脚本、方法、参数三张表的关联数据-->
+    <delete id="deleteScript">
+        DELETE script,method,param from
+        (script LEFT JOIN method ON script.id=method.scriptId)
+        LEFT JOIN param ON method.id = param.methodId
+        WHERE script.id=#{id}
+    </delete>
+    <!--根据脚本id删除方法、参数两张表的关联数据-->
+    <delete id="deleteScriptSon">
+        DELETE method,param from
+        (script LEFT JOIN method ON script.id=method.scriptId)
+        LEFT JOIN param ON method.id = param.methodId
+        WHERE script.id=#{id}
+    </delete>
+    <!--根据查询条件获取脚本列表-->
+    <select id="scriptList" parameterType="java.util.Map"
+            resultType="com.thinkingdata.server.model.ScriptEntity">
+        select * from script where 1=1
+        <if test="id != null and id != ''">
+            and id=#{id}
+        </if>
+        <if test="name != null and name != ''">
+            and name like concat('%', #{name}, '%')
+        </if>
+        <if test="owner != null and owner != ''">
+            and owner like concat('%', #{owner}, '%')
+        </if>
+        <if test="projectId != null and projectId != ''">
+            and projectId=#{projectId}
+        </if>
+        <if test="isDone != null and isDone != ''">
+            and isDone=#{isDone}
+        </if>
+        <if test="type != null and type != ''">
+            and type=#{type}
+        </if>
+        order by id desc limit
+        #{start},#{end}
+    </select>
+    <!--根据查询条件获取脚本总数-->
+    <select id="scriptTotal" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from script where 1=1
+        <if test="id != null and id != ''">
+            and id=#{id}
+        </if>
+        <if test="name != null and name != ''">
+            and name like concat('%', #{name}, '%')
+        </if>
+        <if test="owner != null and owner != ''">
+            and owner like concat('%', #{owner}, '%')
+        </if>
+        <if test="projectId != null and projectId != ''">
+            and projectId=#{projectId}
+        </if>
+        <if test="isDone != null and isDone != ''">
+            and isDone=#{isDone}
+        </if>
+        <if test="type != null and type != ''">
+            and type=#{type}
+        </if>
+    </select>
+    <!--更新脚本配置完成的标识-->
+    <update id="updateIsDone">
+            UPDATE script set isDone = 1 where id=#{id}
+    </update>
+    <!--更新脚本未配置完成的标识-->
+    <update id="updateNoDone">
+            UPDATE script set isDone = 0 where id=#{id}
+    </update>
+    <update id="updateScript" parameterType="com.thinkingdata.server.model.ScriptEntity">
+            UPDATE script
+        <set>
+            <if test="name != null and name != '' ">
+                name = #{name},
+            </if>
+            <if test="projectId != null and projectId != '' ">
+                projectId = #{projectId},
+            </if>
+            <if test="content != null and content != '' ">
+                content = #{content},
+            </if>
+            <if test="type != null and type != '' ">
+                type = #{type},
+            </if>
+            <if test="owner != null and owner != '' ">
+                owner = #{owner},
+            </if>
+            isDone=#{isDone}
+        </set>
+ where id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,66 @@
+server:
+  port: 9999
+  servlet:
+    context-path: /qa_backend
+
+spring:
+  datasource:
+    createdata:
+      jdbc-url: jdbc:mysql://47.100.78.246:3306/createdata?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+      username: root
+      password: it789123
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+
+  redis:
+    lettuce:
+      pool:
+        MaxTotal: 50
+        minIdle: 1
+        maxWaitMillis: 5000
+        maxIdle: 5
+        testOnBorrow: true
+        testOnReturn: true
+        testWhileIdle: true
+    createdata:
+      database: 1
+      hostName: 47.100.78.246
+      password:
+      port: 6379
+      timeout: 5000
+
+
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+logging:
+  config: classpath:logback-spring.xml
+  path: log
+  level:
+    root: info
+    com.thinkingdat.server.dao: DEBUG
+
+corsFilter:
+  allowOrigins: http://47.100.78.246:8080,http://127.0.0.1:8080,http://47.100.78.246,http://qa.thinkingdata.com,http://localhost:8080
+  allowedMethods: POST,GET,PUT,OPTIONS,DELETE
+
+python_config:
+  root: /Users/zhuwei/Documents/pythonProject/create_data
+  refelect_tool: /Users/zhuwei/Documents/pythonProject/create_data/scripts/refelect_tool.py
+  exec_method: exec_method
+javaPath:
+  #extDir: /usr/local/zhuwei/javaWorkspace/jars/
+   extDir: /Users/zhuwei/Documents/jars/
+
+
+

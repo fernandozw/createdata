@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.server.dao.ProjectDao">
+    <!--新增项目信息-->
+    <insert id="addProject" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id" parameterType="com.thinkingdata.server.model.ProjectEntity">
+        INSERT INTO
+        project(name)
+        VALUES(#{name})
+    </insert>
+    <!--根据查询条件获取项目列表-->
+    <select id="projectList" parameterType="java.util.Map"
+            resultType="com.thinkingdata.server.model.ProjectEntity">
+        select * from project where 1=1
+        <if test="id != null and id != ''">
+            and id=#{id}
+        </if>
+        <if test="name != null and name != ''">
+            and name like concat('%', #{name}, '%')
+        </if>
+        order by updateTime desc limit
+        #{start},#{end}
+    </select>
+    <!--根据查询条件获取项目总数-->
+    <select id="projectTotal" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from project where 1=1
+        <if test="id != null and id != ''">
+            and id=#{id}
+        </if>
+        <if test="name != null and name != ''">
+            and name like concat('%', #{name}, '%')
+        </if>
+    </select>
+    <!--更新项目信息-->
+    <update id="updateProject" parameterType="com.thinkingdata.server.model.ProjectEntity">
+        UPDATE project
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name}
+            </if>
+        </set>
+        <where>
+            id = #{id}
+        </where>
+    </update>
+    <!--根据项目id删除项目-->
+    <delete id="deleteProject">
+        DELETE from project WHERE id=#{id}
+    </delete>
+    <!--获取所有项目并组装成下拉列表-->
+    <resultMap id="selectList" type="java.util.Map">
+        <result property="value" column="id"/>
+        <result property="label" column="name"/>
+    </resultMap>
+    <select id="projectSelectList" resultMap="selectList">
+        select id ,name from project
+    </select>
+    <select id="getProjectById" resultType="com.thinkingdata.server.model.ProjectEntity">
+        select * from project where id=#{id}
+    </select>
+</mapper>

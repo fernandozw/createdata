@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的 -->
+<mapper namespace="com.thinkingdata.server.dao.ParamDao">
+    <!--批量新增参数信息-->
+    <insert id="batchAddParam" useGeneratedKeys="true" keyProperty="id"
+            keyColumn="id" parameterType="java.util.List">
+        INSERT INTO
+        param(methodId,paramName,paramValue,paramMark,paramType,paramWidget)
+        VALUES
+        <foreach collection="paramList" item="paramEntity" separator=",">
+            (
+            #{paramEntity.methodId},
+            #{paramEntity.paramName},
+            #{paramEntity.paramValue},
+            #{paramEntity.paramMark},
+            #{paramEntity.paramType},
+            #{paramEntity.paramWidget}
+            )
+        </foreach>
+    </insert>
+    <!--批量更新参数信息-->
+    <update id="batchUpdateParam" parameterType="java.util.List">
+        <foreach collection="paramList" item="paramEntity" index="index" open="" close="" separator=";">
+            UPDATE param
+            <set>
+                <if test="paramEntity.paramName != null and paramEntity.paramName != ''">
+                    paramName = #{paramEntity.paramName},
+                </if>
+                <if test="paramEntity.paramMark != null and paramEntity.paramMark != ''">
+                    paramMark = #{paramEntity.paramMark},
+                </if>
+                paramValue = #{paramEntity.paramValue},paramWidget = #{paramEntity.paramWidget}
+            </set>
+            <where>
+                id = #{paramEntity.id}
+            </where>
+        </foreach>
+    </update>
+    <!--根据方法id获取参数对象-->
+    <select id="getParamsByMethodId"
+            resultType="com.thinkingdata.server.model.ParamEntity">
+		select * from param where methodId=#{methodId}
+	</select>
+    <!--根据参数id获取方法对象-->
+    <select id="getMethodById"
+            resultType="com.thinkingdata.server.model.MethodEntity">
+		select * from method where id = #{methodId}
+	</select>
+    <select id="getParamByScriptId"
+            resultType="com.thinkingdata.server.model.ParamEntity">
+		select * from param where methodId in (select id from method where scriptId = #{scriptId}) group by methodId
+	</select>
+
+    <!--根据方法id删除参数-->
+    <delete id="deleteByMethodId">
+        DELETE from param WHERE methodId=#{methodId}
+    </delete>
+</mapper>
